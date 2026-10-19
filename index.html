@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DanışanPro | Öğrenci & Danışan Yönetim Paneli</title>
+  <meta name="description" content="Öğrenci ve danışan takibi, bugünün randevuları, tek tıkla görüşme özeti notu ve yönetim paneli.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2'><path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z'/><path d='M6 6h10'/><path d='M6 10h10'/></svg>">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#" class="brand" onclick="location.reload(); return false;">
+          <div class="brand-icon" id="brand-logo-icon"></div>
+          <div>
+            <div class="brand-title">DanışanPro</div>
+            <div class="brand-subtitle">Yönetim Paneli</div>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Genel</div>
+
+        <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <span class="nav-item-icon" id="nav-icon-dashboard"></span>
+          <span>Genel Bakış</span>
+          <span class="nav-item-badge" id="nav-today-badge">0</span>
+        </a>
+
+        <a class="nav-item" data-view="students" id="nav-students">
+          <span class="nav-item-icon" id="nav-icon-students"></span>
+          <span>Öğrenciler & Danışanlar</span>
+        </a>
+
+        <a class="nav-item" data-view="appointments" id="nav-appointments">
+          <span class="nav-item-icon" id="nav-icon-appointments"></span>
+          <span>Randevu Yönetimi</span>
+        </a>
+
+        <a class="nav-item" data-view="notes" id="nav-notes">
+          <span class="nav-item-icon" id="nav-icon-notes"></span>
+          <span>Görüşme Notları</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary btn-sm" id="btn-reset-demo-data" style="width: 100%; font-size: 0.78rem;">
+          <span id="icon-btn-reset"></span>
+          <span>Örnek Verileri Yükle</span>
+        </button>
+        <div style="font-size: 0.72rem; color: var(--text-muted); text-align: center;">
+          DanışanPro v2.5 • SaaS
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <!-- HEADER -->
+      <header class="top-header">
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menüyü Aç/Kapat">
+          <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+
+        <!-- Command Palette (Spotlight) Search Bar Trigger -->
+        <div class="header-search" id="header-search-trigger" title="Spotlight Hızlı Arama (Ctrl + K)">
+          <span class="search-icon" id="header-search-icon"></span>
+          <div class="search-fake-input">
+            <span>Danışan, randevu veya komut ara...</span>
+            <span class="kbd-badge">Ctrl K</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="date-pill" id="date-indicator">
+            <span id="date-pill-icon"></span>
+            <span id="current-date-display">19 Ekim 2026, Pazartesi</span>
+          </div>
+
+          <button class="icon-btn" id="theme-toggle-btn" title="Koyu / Açık Mod">
+            <!-- Injected via JS -->
+          </button>
+
+          <!-- User Profile Dropdown -->
+          <div class="user-profile-menu" id="user-profile-menu">
+            <button class="user-profile-btn" id="user-profile-btn" aria-haspopup="true">
+              <div class="user-avatar-mini">CD</div>
+              <div style="text-align: left;">
+                <div class="user-name-text">Uzm. Psk. Canan D.</div>
+              </div>
+              <span class="user-role-badge">Admin</span>
+              <span id="profile-chevron"></span>
+            </button>
+
+            <div class="user-dropdown-card" id="user-dropdown-card">
+              <div class="user-dropdown-header">
+                <div class="user-dropdown-name">Uzm. Psk. Canan Demir</div>
+                <div class="user-dropdown-email">canan.demir@danisanpro.com</div>
+              </div>
+              <div class="user-dropdown-item" id="menu-item-profile">
+                <span class="app-icon icon-sm" id="icon-menu-profile"></span>
+                <span>Danışman Profili</span>
+              </div>
+              <div class="user-dropdown-item" id="menu-item-export-all">
+                <span class="app-icon icon-sm" id="icon-menu-export"></span>
+                <span>Tüm Verileri İndir (CSV)</span>
+              </div>
+              <div class="user-dropdown-item" id="menu-item-logout" style="color: var(--danger);">
+                <span class="app-icon icon-sm" id="icon-menu-logout"></span>
+                <span>Oturumu Kapat</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- PAGE CONTAINER -->
+      <main class="page-container">
+
+        <!-- VIEW 1: DASHBOARD -->
+        <section class="view-section active" id="view-dashboard">
+
+          <!-- Critical Appointment Alarm Banner -->
+          <div class="alert-banner" id="alert-banner" style="display: none;">
+            <div class="alert-banner-left">
+              <span class="alert-banner-icon" id="alert-banner-bell"></span>
+              <span id="alert-banner-text">Yaklaşan randevunuz bulunuyor.</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-primary" id="btn-alert-quick-action" style="font-size: 0.78rem;">
+                ⚡ Not Gir / İncele
+              </button>
+            </div>
+          </div>
+
+          <!-- Page Header -->
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Genel Bakış</h1>
+              <p class="page-description">Günlük randevu programınız, danışan durumları ve seans görevleri.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-secondary" onclick="window.openStudentModal()">
+                <span class="btn-icon-slot" data-icon="plus"></span>
+                <span>Yeni Danışan</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.openAppointmentModal()">
+                <span class="btn-icon-slot" data-icon="plus"></span>
+                <span>Randevu Planla</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Stat Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Toplam Danışan</span>
+                <span class="stat-card-icon" id="kpi-icon-students"></span>
+              </div>
+              <div class="stat-value" id="stat-total-students">0</div>
+              <div class="stat-subtext" id="stat-active-students">0 Aktif / 0 Pasif</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Bugünün Randevuları</span>
+                <span class="stat-card-icon" id="kpi-icon-today"></span>
+              </div>
+              <div class="stat-value" id="stat-today-appointments">0</div>
+              <div class="stat-subtext" id="stat-today-pending">0 Bekleyen</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Tamamlanan Görüşmeler</span>
+                <span class="stat-card-icon" id="kpi-icon-completed"></span>
+              </div>
+              <div class="stat-value" id="stat-completed-apts">0</div>
+              <div class="stat-subtext">Başarıyla sonuçlanan</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Görüşme Notları</span>
+                <span class="stat-card-icon" id="kpi-icon-notes"></span>
+              </div>
+              <div class="stat-value" id="stat-total-notes">0</div>
+              <div class="stat-subtext">Kayıtlı detaylı not</div>
+            </div>
+          </div>
+
+          <!-- SPOTLIGHT: BUGÜNÜN RANDEVULARI (Tek Kompakt Liste Tablosu) -->
+          <div class="today-spotlight">
+            <div class="spotlight-header">
+              <div class="spotlight-title-group">
+                <span class="stat-card-icon" style="color: var(--primary);" id="spotlight-header-icon"></span>
+                <h2 class="spotlight-title">Bugünün Randevuları</h2>
+                <span class="badge badge-pending" id="today-badge-count" style="margin-left: 6px;">0 Bekliyor</span>
+              </div>
+
+              <!-- Spotlight Tools: Fast Filters & Excel/CSV Export -->
+              <div class="spotlight-tools">
+                <div class="today-filter-tabs">
+                  <button class="today-filter-btn active" data-today-filter="all">Tümü</button>
+                  <button class="today-filter-btn" data-today-filter="pending">Bekleyenler</button>
+                  <button class="today-filter-btn" data-today-filter="completed">Tamamlananlar</button>
+                </div>
+
+                <button class="btn btn-secondary btn-sm" id="btn-export-today-csv" title="Bugünkü listeyi CSV / Excel formatında indir">
+                  <span id="icon-btn-download"></span>
+                  <span>Excel / CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="modern-table" id="today-table">
+                <thead>
+                  <tr>
+                    <th style="width: 100px;">Saat</th>
+                    <th>Öğrenci / Danışan</th>
+                    <th>Görüşme Türü</th>
+                    <th>Konu</th>
+                    <th style="width: 130px;">Durum</th>
+                    <th style="text-align: right; width: 170px;">Aksiyon</th>
+                  </tr>
+                </thead>
+                <tbody id="today-appointments-tbody">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 2-COLUMN SECTION: Son Eklenen Görüşme Notları & Günün Yapılacakları -->
+          <div class="dashboard-two-cols">
+            <!-- Sol Kolon: Son Eklenen Görüşme Notları -->
+            <div class="widget-card">
+              <div class="widget-header">
+                <h3 class="widget-title">
+                  <span id="icon-widget-notes"></span>
+                  <span>Son Eklenen Görüşme Notları</span>
+                </h3>
+                <button class="btn btn-secondary btn-sm" onclick="window.switchView('notes')" style="font-size: 0.75rem;">
+                  Tümünü Gör
+                </button>
+              </div>
+              <div class="widget-body">
+                <div class="recent-notes-list" id="recent-notes-list">
+                  <!-- Rendered via JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Sağ Kolon: Günün Yapılacakları (Action Items) -->
+            <div class="widget-card">
+              <div class="widget-header">
+                <h3 class="widget-title">
+                  <span id="icon-widget-tasks"></span>
+                  <span>Günün Yapılacakları (Seans Görevleri)</span>
+                </h3>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="badge badge-active" id="tasks-counter">0 / 0</span>
+                  <button class="btn btn-secondary btn-sm" id="btn-seed-tasks" style="font-size: 0.72rem; padding: 3px 8px;" title="Örnek görevleri listeye ekle">
+                    + Örnek Görevleri Ekle
+                  </button>
+                </div>
+              </div>
+              <div class="widget-body">
+                <div class="tasks-container">
+                  <form id="task-add-form" class="task-input-bar">
+                    <input type="text" class="task-input" id="task-new-input" placeholder="Yeni seans görevi ekle (örn: PDF çalışma planı ilet)...">
+                    <button type="submit" class="btn btn-primary btn-sm">Ekle</button>
+                  </form>
+                  <div class="task-list" id="tasks-list">
+                    <!-- Rendered via JS -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- VIEW 2: STUDENTS CRUD -->
+        <section class="view-section" id="view-students">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Öğrenciler & Danışanlar</h1>
+              <p class="page-description">Kayıtlı danışanlarınızı yönetin, durumlarını güncelleyin ve geçmişlerini inceleyin.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-secondary" onclick="window.openAppointmentModal()">
+                <span class="btn-icon-slot" data-icon="plus"></span>
+                <span>Randevu Planla</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.openStudentModal()">
+                <span class="btn-icon-slot" data-icon="plus"></span>
+                <span>Yeni Danışan</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-box-header">
+              <div class="filter-bar">
+                <input type="text" class="filter-input" id="student-search-input" placeholder="İsim, telefon veya alan ara..." style="min-width: 260px;">
+                <select class="filter-select" id="student-status-filter">
+                  <option value="all">Tüm Durumlar</option>
+                  <option value="Aktif">Yalnızca Aktifler</option>
+                  <option value="Pasif">Yalnızca Pasifler</option>
+                  <option value="deleted">Silinenler (Çöp Kutusu)</option>
+                </select>
+              </div>
+
+              <!-- Students View Mode: Table vs Cards -->
+              <div class="tab-pills">
+                <button class="tab-pill active" id="btn-student-view-table">Tablo</button>
+                <button class="tab-pill" id="btn-student-view-cards">Kartlar</button>
+              </div>
+            </div>
+
+            <!-- Table View -->
+            <div class="table-responsive" id="students-table-wrapper">
+              <table class="modern-table">
+                <thead>
+                  <tr>
+                    <th>Danışan / Öğrenci</th>
+                    <th>Kategori / Alan</th>
+                    <th>Durum</th>
+                    <th>Kayıt & Geçmiş</th>
+                    <th style="text-align: right;">İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody id="students-table-body">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Card Grid View -->
+            <div class="students-card-grid" id="students-card-grid" style="display: none;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 3: APPOINTMENTS CRUD -->
+        <section class="view-section" id="view-appointments">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Randevu Yönetimi</h1>
+              <p class="page-description">Görüşme takvimini görüntüleyin, yeni randevular oluşturun ve durumları takip edin.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-secondary" onclick="window.openStudentModal()">
+                <span class="btn-icon-slot" data-icon="plus"></span>
+                <span>Yeni Danışan</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.openAppointmentModal()">
+                <span class="btn-icon-slot" data-icon="plus"></span>
+                <span>Randevu Planla</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-box-header">
+              <div class="tab-pills">
+                <button class="tab-pill appointment-status-tab active" data-filter="all">Tüm Randevular</button>
+                <button class="tab-pill appointment-status-tab" data-filter="today">Bugünün Randevuları</button>
+                <button class="tab-pill appointment-status-tab" data-filter="upcoming">Yaklaşanlar</button>
+                <button class="tab-pill appointment-status-tab" data-filter="completed">Tamamlananlar</button>
+              </div>
+
+              <div class="filter-bar">
+                <input type="text" class="filter-input" id="appointment-search-input" placeholder="Danışan adı veya konu ara...">
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="modern-table">
+                <thead>
+                  <tr>
+                    <th style="width: 140px;">Tarih & Saat</th>
+                    <th>Öğrenci / Danışan</th>
+                    <th>Görüşme Türü</th>
+                    <th>Konu</th>
+                    <th style="width: 130px;">Durum</th>
+                    <th style="text-align: right;">İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody id="appointments-table-body">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 4: NOTES CRUD -->
+        <section class="view-section" id="view-notes">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Görüşme Notları Geçmişi</h1>
+              <p class="page-description">Görüşmelerde alınan özet kararlar, ev ödevleri ve verimlilik değerlendirmeleri.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-secondary" id="btn-print-notes-view" title="Notları PDF olarak yazdır veya kaydet">
+                <span id="icon-btn-print"></span>
+                <span>Yazdır / PDF</span>
+              </button>
+              <button class="btn btn-secondary" onclick="window.openStudentModal()">
+                <span class="btn-icon-slot" data-icon="plus"></span>
+                <span>Yeni Danışan</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.openEditNoteModal()">
+                <span class="btn-icon-slot" data-icon="plus"></span>
+                <span>Yeni Not Yaz</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-box-header">
+              <div class="filter-bar">
+                <input type="text" class="filter-input" id="note-search-input" placeholder="Not içeriğinde ara..." style="min-width: 260px;">
+                <select class="filter-select" id="note-student-filter">
+                  <option value="all">Tüm Öğrenciler & Danışanlar</option>
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+            </div>
+
+            <div class="notes-grid" id="notes-grid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== SPOTLIGHT / COMMAND PALETTE MODAL (CTRL + K) ==================== -->
+  <div class="palette-overlay" id="palette-overlay">
+    <div class="palette-box">
+      <div class="palette-search-wrapper">
+        <span class="palette-search-icon" id="palette-search-icon"></span>
+        <input type="text" class="palette-input" id="palette-input" placeholder="Danışan ara, randevu bul veya komut çalıştır..." autocomplete="off">
+        <span class="kbd-badge" id="palette-close-badge">ESC</span>
+      </div>
+      <div class="palette-results" id="palette-results">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="palette-footer">
+        <div>Klavye: <span class="kbd-badge">↑</span> <span class="kbd-badge">↓</span> Gezin &nbsp; <span class="kbd-badge">↵</span> Seç</div>
+        <div>DanışanPro Hızlı Erişim</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- MODAL 1: ADD/EDIT STUDENT -->
+  <div class="modal-overlay" id="modal-student">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-student-title">Yeni Danışan Ekle</h3>
+        <button class="modal-close" data-modal-close aria-label="Kapat">&times;</button>
+      </div>
+      <form id="student-form">
+        <div class="modal-body">
+          <input type="hidden" id="student-id-field">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="student-fullname">Ad - Soyad <span class="required">*</span></label>
+              <input type="text" class="form-control" id="student-fullname" placeholder="Örn: Ahmet Yılmaz" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="student-phone">Telefon <span class="required">*</span></label>
+              <input type="tel" class="form-control" id="student-phone" placeholder="Örn: 0532 111 22 33" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="student-email">E-posta</label>
+              <input type="email" class="form-control" id="student-email" placeholder="ahmet@example.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="student-category">Kategori / Alan</label>
+              <input type="text" class="form-control" id="student-category" placeholder="Örn: YKS Sayısal, Kariyer, Dil">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Durum</label>
+            <div class="status-radio-group">
+              <label class="status-radio-label">
+                <input type="radio" name="student-status" value="Aktif" checked>
+                <span>Aktif</span>
+              </label>
+              <label class="status-radio-label">
+                <input type="radio" name="student-status" value="Pasif">
+                <span>Pasif</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="student-notes">Özel Danışan Notları</label>
+            <textarea class="form-control" id="student-notes" placeholder="Öğrencinin hedefleri ve çalışma planı..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-modal-close>İptal</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-student">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ADD/EDIT APPOINTMENT -->
+  <div class="modal-overlay" id="modal-appointment">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-appointment-title">Randevu Planla</h3>
+        <button class="modal-close" data-modal-close aria-label="Kapat">&times;</button>
+      </div>
+      <form id="appointment-form">
+        <div class="modal-body">
+          <input type="hidden" id="apt-id-field">
+
+          <div class="form-group">
+            <label class="form-label" for="apt-student-id">Öğrenci / Danışan <span class="required">*</span></label>
+            <select class="form-control" id="apt-student-id" required>
+              <option value="">-- Danışan Seçin --</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="apt-date">Randevu Tarihi <span class="required">*</span></label>
+              <input type="date" class="form-control" id="apt-date" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="apt-time">Saat <span class="required">*</span></label>
+              <input type="time" class="form-control" id="apt-time" value="11:00" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="apt-type">Görüşme Türü</label>
+              <select class="form-control" id="apt-type">
+                <option value="Online (Zoom)">Online (Zoom)</option>
+                <option value="Online (Google Meet)">Online (Google Meet)</option>
+                <option value="Yüz Yüze Görüşme">Yüz Yüze Görüşme</option>
+                <option value="Telefon Görüşmesi">Telefon Görüşmesi</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="apt-status">Durum</label>
+              <select class="form-control" id="apt-status">
+                <option value="Bekliyor">Bekliyor</option>
+                <option value="Tamamlandı">Tamamlandı</option>
+                <option value="İptal">İptal Edildi</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="apt-topic">Görüşme Konusu / Başlık</label>
+            <input type="text" class="form-control" id="apt-topic" placeholder="Örn: Deneme Analizi, Haftalık Çizelge Kontrolü">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-modal-close>Vazgeç</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-appointment">Randevuyu Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: TEK TIKLA HIZLI ÖZET NOTU & TAMAMLA -->
+  <div class="modal-overlay" id="modal-quick-note">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Görüşme Notu & Tamamlama</h3>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+            Notu kaydettiğinizde randevu durumu otomatik olarak <strong>"Tamamlandı"</strong> yapılacaktır.
+          </div>
+        </div>
+        <button class="modal-close" data-modal-close aria-label="Kapat">&times;</button>
+      </div>
+
+      <form id="quick-note-form">
+        <div class="modal-body">
+          <input type="hidden" id="quick-note-apt-id">
+
+          <!-- Highlight Summary Card -->
+          <div style="background-color: var(--bg-subtle); padding: 12px 16px; border-radius: var(--radius-md); border-left: 3px solid var(--primary);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 0.72rem; color: var(--text-subtle); font-weight: 600;">DANIŞAN</span>
+                <div id="quick-note-student-name" style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Ahmet Yılmaz</div>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.72rem; color: var(--text-subtle); font-weight: 600;">RANDEVU SAATİ</span>
+                <div id="quick-note-appointment-time" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--primary);">Bugün 11:00</div>
+              </div>
+            </div>
+            <div style="margin-top: 6px; font-size: 0.82rem; color: var(--text-body);">
+              <strong>Konu:</strong> <span id="quick-note-topic">TYT Deneme Analizi</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quick-note-title">Not Başlığı</label>
+            <input type="text" class="form-control" id="quick-note-title" placeholder="Görüşme değerlendirmesi başlığı">
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" for="quick-note-content" style="margin-bottom: 0;">Görüşme Özeti & Değerlendirme <span class="required">*</span></label>
+              <div class="quick-templates-bar" style="margin-bottom: 0;">
+                <button type="button" class="template-chip-btn" data-template="general" title="Genel Değerlendirme Taslağı">
+                  📋 Genel
+                </button>
+                <button type="button" class="template-chip-btn" data-template="homework" title="Ödev & Görev Taslağı">
+                  📌 Ödev / Görev
+                </button>
+                <button type="button" class="template-chip-btn" data-template="goal" title="Hedef Belirleme Taslağı">
+                  🎯 Hedef
+                </button>
+              </div>
+            </div>
+            <textarea class="form-control" id="quick-note-content" style="min-height: 110px;" placeholder="Görüşmede konuşulanlar ve danışan gelişimi (Yukarıdaki hazır şablon butonlarına basabilirsiniz)..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quick-note-actions">Alınan Kararlar / Ev Ödevi</label>
+            <textarea class="form-control" id="quick-note-actions" placeholder="Örn: 1. Matematik 3 test bitecek&#10;2. Çarşamba soru çözümü"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quick-note-rating">Verimlilik Puanı</label>
+            <select class="form-control" id="quick-note-rating">
+              <option value="5">5 Yıldız - Çok Verimli (5/5)</option>
+              <option value="4">4 Yıldız - İyi & İlerleme Var (4/5)</option>
+              <option value="3">3 Yıldız - Orta Düzey (3/5)</option>
+              <option value="2">2 Yıldız - Geliştirilmeli (2/5)</option>
+              <option value="1">1 Yıldız - Aksaklık Oldu (1/5)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-modal-close>Vazgeç</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-quick-note">
+            Kaydet & Tamamla
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: EDIT / ADD REGULAR NOTE -->
+  <div class="modal-overlay" id="modal-edit-note">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-edit-note-title">Görüşme Notu</h3>
+        <button class="modal-close" data-modal-close aria-label="Kapat">&times;</button>
+      </div>
+      <form id="edit-note-form">
+        <div class="modal-body">
+          <input type="hidden" id="edit-note-id-field">
+
+          <div class="form-group">
+            <label class="form-label" for="edit-note-student-id">Öğrenci / Danışan <span class="required">*</span></label>
+            <select class="form-control" id="edit-note-student-id" required>
+              <option value="">-- Danışan Seçin --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-note-title">Başlık</label>
+            <input type="text" class="form-control" id="edit-note-title" placeholder="Görüşme başlığı">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-note-content">Görüşme Özeti & Notlar <span class="required">*</span></label>
+            <textarea class="form-control" id="edit-note-content" style="min-height: 110px;" required placeholder="Görüşme içeriği..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-note-actions">Alınan Kararlar / Ev Ödevleri</label>
+            <textarea class="form-control" id="edit-note-actions" placeholder="Sonraki görüşmeye kadar yapılması gerekenler..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-note-rating">Verim Puanı</label>
+            <select class="form-control" id="edit-note-rating">
+              <option value="5">5 Yıldız - Çok Başarılı</option>
+              <option value="4">4 Yıldız - İyi</option>
+              <option value="3">3 Yıldız - Orta</option>
+              <option value="2">2 Yıldız - Geliştirilmeli</option>
+              <option value="1">1 Yıldız - Zayıf</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-modal-close>İptal</button>
+          <button type="submit" class="btn btn-primary">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 5: STUDENT 360 DETAIL -->
+  <div class="modal-overlay" id="modal-student-detail">
+    <div class="modal-box" style="max-width: 660px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Danışan Detay Kartı</h3>
+        <button class="modal-close" data-modal-close aria-label="Kapat">&times;</button>
+      </div>
+      <div class="modal-body" id="student-detail-content">
+        <!-- Rendered via JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-modal-close>Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER DRAWER FOR STUDENT PROFILE -->
+  <div class="drawer-overlay" id="student-drawer-overlay">
+    <div class="drawer-panel" id="student-drawer-panel">
+      <div class="drawer-header">
+        <div>
+          <h3 class="modal-title" id="drawer-student-name">Danışan Profili</h3>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;" id="drawer-student-category">Genel Danışan</div>
+        </div>
+        <button class="modal-close" id="drawer-close-btn" aria-label="Kapat">&times;</button>
+      </div>
+      <div class="drawer-body" id="drawer-student-content">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 6: CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="modal-confirm">
+    <div class="modal-box" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="confirm-modal-title">Onay Gerekiyor</h3>
+        <button class="modal-close" data-modal-close aria-label="Kapat">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-modal-message" style="color: var(--text-body); font-size: 0.9rem; line-height: 1.5;"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-modal-close>Vazgeç</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-action">Onayla & Devam Et</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/notify.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
